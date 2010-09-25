@@ -8,6 +8,7 @@ use parent 'DBIx::Class';
 # ABSTRACT: Remove the boilerplate from your TO_JSON functions
 
 __PACKAGE__->mk_group_accessors(inherited => '_serializable_columns');
+__PACKAGE__->mk_classdata( mapper => {} );
 
 my $dont_serialize = {
    text  => 1,
@@ -47,10 +48,20 @@ sub serializable_columns {
 sub TO_JSON {
    my $self = shift;
 
-   return {
-      map +($_ => $self->$_),
-         @{$self->serializable_columns}
-   };
+   my %result;
+
+   for my $col (@{ $self->serializable_columns }) {
+      my $col_type = $self->result_source->column_info($col)->{data_type};
+
+      if( $col_type && ref(my $code = $self->mapper->{$col_type}) eq 'CODE' ) {
+         $result{$col} = $code->($self->$col);
+      }
+      else {
+         $result{$col} = $self->$col;
+      }
+   }
+
+   return \%result;
 }
 
 1;

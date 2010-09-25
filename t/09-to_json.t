@@ -56,4 +56,17 @@ MORE_COMPLEX_JSON: {
    }], 'complex TO_JSON works');
 }
 
+MAPPED_JSON: {
+    my $datas = [
+        map $_->TO_JSON,
+            $schema->resultset('Mappy')->search(undef, { order_by => 'id' })->all
+        ];
+
+    cmp_deeply($datas,[{
+            id => 1,
+            somedate => '22:22:22 1111-11-11'
+        },
+        ], 'mapped TO_JSON works');
+}
+
 done_testing;
