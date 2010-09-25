@@ -52,7 +52,7 @@ sub generate_ddl {
 
 sub prepopulate {
    my $self = shift;
-   $self->resultset($_)->delete for qw{Bar Foo Gnarly_Station Bloaty Gnarly Station};
+   $self->resultset($_)->delete for qw{Bar Foo Gnarly_Station Bloaty Gnarly Station Mappy};
 
    $self->populate( Gnarly => [
       [qw{id name}],
@@ -102,6 +102,11 @@ sub prepopulate {
       [4,4],
       [5,5],
    ]);
+   
+   $self->populate(Mappy => [
+      [qw{id somedate}],
+      [1,'1111-11-11 22:22:22'],
+   ]);   
 }
 
 'kitten eater';
