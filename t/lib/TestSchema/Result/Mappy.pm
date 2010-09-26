@@ -5,7 +5,7 @@ use DBIx::Class::Candy
 
 __PACKAGE__->mk_classdata(
     mapper => {
-        date => sub { my $dt = shift; $dt->hms . ' '. $dt->ymd() },
+        DateTime => sub { my $dt = shift; $dt->hms . ' '. $dt->ymd() },
     },
 );
 

@@ -2,6 +2,7 @@ package DBIx::Class::Helper::Row::ToJSON;
 
 use strict;
 use warnings;
+use Scalar::Util qw/blessed/;
 
 use parent 'DBIx::Class';
 
@@ -50,20 +51,26 @@ sub TO_JSON {
 
    my %result;
 
-   for my $col (@{ $self->serializable_columns }) {
-      my $col_type = $self->result_source->column_info($col)->{data_type};
+   return {
+      map +(
+         $_ => $self->_maybe_map_column( $self->$_ )
+      ), @{ $self->serializable_columns }
+   };
+}
 
-      if( $col_type && ref(my $code = $self->mapper->{$col_type}) eq 'CODE' ) {
-         $result{$col} = $code->($self->$col);
-      }
-      else {
-         $result{$col} = $self->$col;
+sub _maybe_map_column {
+   my ( $self, $col ) = @_;
+
+   if( blessed($col) ) {
+      foreach my $isa ( keys %{ $self->mapper } ) {
+         if( $col->isa($isa) && ref( my $code = $self->mapper->{$isa} ) eq 'CODE') {
+            return $code->($col);
+         }
       }
    }
 
-   return \%result;
+$col;
 }
-
 1;
 
 =pod
