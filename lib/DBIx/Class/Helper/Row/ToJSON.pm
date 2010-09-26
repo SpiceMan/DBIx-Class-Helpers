@@ -69,7 +69,7 @@ sub _maybe_map_column {
       }
    }
 
-$col;
+   $col;
 }
 1;
 
